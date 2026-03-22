@@ -29,8 +29,9 @@ st.divider()
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # --- CHAT HISTORY ---
-if "messages" not in st.session_state:
-    st.session_state.messages = []
+if len(st.session_state.messages) > 20:
+    st.warning("Session limit reached. Please refresh to start a new conversation.")
+    st.stop()
 
 # --- WELCOME MESSAGE ---
 if not st.session_state.messages:
