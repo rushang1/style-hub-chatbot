@@ -29,6 +29,9 @@ st.divider()
 client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # --- CHAT HISTORY ---
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
 if len(st.session_state.messages) > 20:
     st.warning("Session limit reached. Please refresh to start a new conversation.")
     st.stop()
@@ -45,29 +48,33 @@ for message in st.session_state.messages:
 
 # --- CHAT INPUT ---
 if prompt := st.chat_input("Ask me anything about fashion or our store..."):
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    with st.chat_message("user"):
-        st.write(prompt)
+    if len(st.session_state.messages) >= 20:
+        st.warning("Session limit reached. Please refresh to start a new conversation.")
+        st.stop()
+    else:
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        with st.chat_message("user"):
+            st.write(prompt)
 
-    response = client.chat.completions.create(
-        model="gpt-4.1-nano",
-        messages=[
-            {
-                "role": "system",
-                "content": """You are a warm, stylish AI assistant for Style Hub — a premium clothing store in Jalandhar. 
-                You help customers with:
-                - Outfit recommendations for any occasion
-                - Store timings (10am - 8pm, all days)
-                - Styling tips and fashion advice
-                - Finding the right fit and colors for their body type
-                
-                Keep replies short, friendly and confident. Use emojis occasionally. 
-                If asked anything unrelated to fashion or the store, politely redirect."""
-            }
-        ] + st.session_state.messages
-    )
+        response = client.chat.completions.create(
+            model="gpt-4.1-nano",
+            messages=[
+                {
+                    "role": "system",
+                    "content": """You are a warm, stylish AI assistant for Style Hub — a premium clothing store in Jalandhar. 
+                    You help customers with:
+                    - Outfit recommendations for any occasion
+                    - Store timings (10am - 8pm, all days)
+                    - Styling tips and fashion advice
+                    - Finding the right fit and colors for their body type
+                    
+                    Keep replies short, friendly and confident. Use emojis occasionally. 
+                    If asked anything unrelated to fashion or the store, politely redirect."""
+                }
+            ] + st.session_state.messages
+        )
 
-    reply = response.choices[0].message.content
-    st.session_state.messages.append({"role": "assistant", "content": reply})
-    with st.chat_message("assistant"):
-        st.write(reply)
+        reply = response.choices[0].message.content
+        st.session_state.messages.append({"role": "assistant", "content": reply})
+        with st.chat_message("assistant"):
+            st.write(reply)
