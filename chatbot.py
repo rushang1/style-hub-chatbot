@@ -1,8 +1,5 @@
-import os
 import streamlit as st
 from openai import OpenAI
-from dotenv import load_dotenv
-load_dotenv()
 
 # --- CONFIG ---
 st.set_page_config(
@@ -29,7 +26,7 @@ st.markdown("*Your personal stylist, available 24/7*")
 st.divider()
 
 # --- OPENAI CLIENT ---
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 
 # --- CHAT HISTORY ---
 if "messages" not in st.session_state:
